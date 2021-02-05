@@ -1,10 +1,18 @@
 <template>
-  <div id="app" class="videos-container">
-    <Frame />
-    <Thumbnail />
-        <div class="video-player"></div>
-        <div class="video-choices"></div>
+<div class="videos-container" id="app">
+  <div class="video-player">
+      <Frame 
+      :source="current"
+      />
   </div>
+
+  <div class="video-choices">
+    <Thumbnail 
+    :movies="movies" v-on:choose-movie="handleChangeCurrent"
+    />
+  </div>
+</div>
+
 </template>
 
 <script>
@@ -12,28 +20,40 @@
 import Frame from './components/Frame.vue'
 import Thumbnail from './components/Thumbnail.vue'
 export default {
-  name: 'App',
+name: 'App',
 
-  components: {
+components: {
    Frame,
    Thumbnail
   },
 
-  data: function(){
-    return {
-      api: "https://scotch-mvplayer-api.herokuapp.com/api/v1",
-      
-      
-    }
+data() {
+  return {
+    api: "https://scotch-mvplayer-api.herokuapp.com/api/v1",
+    movies: [],
+    current: null
+  }
+  },
+  props: ["source"],
+
+created() {
+    axios.get(this.api).then(res => {
+      this.movies = res.data;
+      this.current = this.movies[0]
+    })
   },
 
-
-  methods: {
+methods: {
+    handleChangeCurrent(movie) {
+      this.current = movie
+    },
     changeCurrent(movie) {
       this.$emit('choose-movie', movie)
-    }
   }
-}
+},
+
+};
+
 </script>
 
 <style>
